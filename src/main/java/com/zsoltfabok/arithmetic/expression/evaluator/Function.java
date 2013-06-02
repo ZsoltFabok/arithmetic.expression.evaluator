@@ -1,4 +1,4 @@
-package evaluator;
+package com.zsoltfabok.arithmetic.expression.evaluator;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

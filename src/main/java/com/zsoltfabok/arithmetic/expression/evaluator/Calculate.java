@@ -1,4 +1,4 @@
-package evaluator;
+package com.zsoltfabok.arithmetic.expression.evaluator;
 
 import java.math.BigDecimal;
 import java.util.Stack;
