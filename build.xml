@@ -1,9 +1,17 @@
-<project name="arithmetic.expression.evaluator" default="compile">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="arithmetic.expression.evaluator" default="compile">
+  <loadproperties srcFile="build.properties"/>
+
+  <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar}" />
+  <ivy:cachepath pathid="ivy.test.compile.path" conf="test" />
+
   <property name="src" value="src/main/java"/>
+  <property name="test-src" value="src/test/java"/>
   <property name="classes" value="target/classes"/>
+  <property name="test-classes" value="target/test-classes"/>
 
   <target name="init">
     <mkdir dir="${classes}"/>
+    <mkdir dir="${test-classes}"/>
   </target>
 
   <target name="clean">
@@ -16,5 +24,32 @@
        debug="true"
        includeantruntime="false"
     />
+  </target>
+
+  <target name="compile.test" depends="compile">
+    <javac srcdir="${test-src}"
+         destdir="${test-classes}"
+         includeantruntime="false">
+      <classpath>
+        <pathelement location="${classes}"/>
+        <path refid="ivy.test.compile.path"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test" depends="compile.test">
+    <junit printsummary="yes" fork="once" haltonfailure="yes">
+      <classpath>
+        <path refid="ivy.test.compile.path"/>
+        <pathelement location="${classes}"/>
+        <pathelement location="${test-classes}"/>
+      </classpath>
+      <formatter type="plain"/>
+      <batchtest>
+        <fileset dir="${test-classes}">
+        <include name="**/*Test.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
   </target>
 </project>

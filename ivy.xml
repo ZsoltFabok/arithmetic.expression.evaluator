@@ -1,0 +1,14 @@
+<ivy-module version="2.0">
+    <info organisation="com.zsoltfabok" module="arithmetic.expression.evaluator"/>
+    <configurations>
+        <conf name="default" visibility="public" extends="compile"/>
+        <conf name="compile" visibility="private" />
+        <conf name="test"    visibility="private" extends="compile"/>
+    </configurations>
+    <publications>
+        <artifact name="arithmetic.expression.evaluator" type="jar" conf="default"/>
+    </publications>
+    <dependencies defaultconfmapping="*->default">
+        <dependency org="junit" name="junit" rev="4.10" conf="test"/>
+    </dependencies>
+</ivy-module>
