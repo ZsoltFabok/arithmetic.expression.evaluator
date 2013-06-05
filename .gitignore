@@ -2,3 +2,6 @@ target
 bin
 .settings
 build.properties
+lib
+*.ser
+TEST-*

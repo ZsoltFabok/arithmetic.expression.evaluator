@@ -1,9 +1,22 @@
-<project name="arithmetic.expression.evaluator" default="compile">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="arithmetic.expression.evaluator" default="compile">
+
+  <property name="pmd.lib" value="lib/pmd"/>
+  <property name="crap4j.lib" value="lib/crap4j/crap4j-1.1.6"/>
+  <property name="findbugs.lib" value="lib/findbugs"/>
+  <property name="junit.lib" value="lib/junit"/>
+  <property name="cobertura.lib" value="lib/cobertura"/>
+  <property name="java2html.lib" value="lib/java2html"/>
+
   <property name="src" value="src/main/java"/>
+  <property name="test-src" value="src/test/java"/>
   <property name="classes" value="target/classes"/>
+  <property name="test-classes" value="target/test-classes"/>
+  <property name="instrumented-classes" value="target/instrumented-classes"/>
+  <property name="reports" value="target/reports"/>
 
   <target name="init">
     <mkdir dir="${classes}"/>
+    <mkdir dir="${reports}"/>
   </target>
 
   <target name="clean">
@@ -16,5 +29,207 @@
        debug="true"
        includeantruntime="false"
     />
+  </target>
+
+  <target name="test">
+    <javac srcdir="${test-src}"
+         destdir="${test-classes}"
+         includeantruntime="false">
+      <classpath>
+        <pathelement location="${classes}"/>
+        <fileset dir="${junit.lib}">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+
+    <junit printsummary="yes" fork="once" haltonfailure="yes">
+      <classpath>
+        <pathelement location="${classes}"/>
+        <pathelement location="${test-classes}"/>
+        <fileset dir="${junit.lib}">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="plain"/>
+      <batchtest>
+        <fileset dir="${test-classes}">
+        <include name="**/*Test.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="findbugs">
+    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+      <classpath>
+        <fileset dir="${findbugs.lib}">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath>
+      </taskdef>
+
+      <mkdir dir="${reports}/findbugs"/>
+      <findbugs home="${findbugs.lib}"
+        output="html"
+        stylesheet="${findbugs.lib}/xsl/fancy-hist.xsl"
+        outputFile="${reports}/findbugs/findbugs.html">
+        <sourcePath path="${src}" />
+        <class location="${classes}" />
+      </findbugs>
+    </target>
+
+  <target name="pmd" depends="init">
+    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+      <classpath>
+        <fileset dir="${pmd.lib}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </taskdef>
+
+    <!-- First generate xml based report; necessary for the html
+         report and for creating difference -->
+    <mkdir dir="${reports}/pmd"/>
+    <pmd rulesetfiles="imports,unusedcode,basic,design,junit,strings">
+      <formatter type="xml" toFile="${reports}/pmd/pmd.xml"/>
+      <fileset dir="${src}" includes="**/*.java"/>
+    </pmd>
+    <!-- create html report -->
+    <xslt in="${reports}/pmd/pmd.xml"
+      style="${pmd.lib}/xslt/pmd-report-per-class.xslt"
+      out="${reports}/pmd/pmd.html">
+    </xslt>
+    <delete file="${reports}/pmd/pmd.xml"/>
+  </target>
+
+  <target name="crap4j">
+    <taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
+      <classpath>
+        <fileset dir="${crap4j.lib}">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath>
+    </taskdef>
+
+    <mkdir dir="${reports}/crap4j"/>
+    <crap4j projectdir="."
+      outputDir="${reports}/crap4j"
+      dontTest="false"
+      debug="false">
+      <classes>
+        <pathElement location="${classes}" />
+      </classes>
+      <srces>
+        <pathElement location="${src}" />
+      </srces>
+      <!-- testClasses>
+        <pathElement location="${test-classes}" />
+      </testClasses -->
+    </crap4j>
+    <delete dir="agitar"/>
+    <delete file="crap_build.xml"/>
+  </target>
+
+  <target name="cobertura">
+    <path id="cobertura.classpath">
+      <fileset dir="${cobertura.lib}">
+          <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+
+    <delete file="cobertura.ser"/>
+    <property name="instrumented-classes" value="target/instrumented-classes"/>
+    <delete dir="${instrumented-classes}"/>
+
+    <cobertura-instrument todir="${instrumented-classes}">
+      <fileset dir="${classes}">
+        <include name="**/*.class"/>
+        <exclude name="**/*Test.class"/>
+      </fileset>
+    </cobertura-instrument>
+
+    <junit printsummary="yes" fork="yes" haltonfailure="no">
+      <sysproperty key="net.sourceforge.cobertura.datafile"
+          file="cobertura.ser" />
+      <classpath>
+        <pathelement location="${instrumented-classes}"/>
+        <pathelement location="${test-classes}"/>
+        <pathelement location="${classes}"/>
+        <path refid="cobertura.classpath"/>
+        <fileset dir="${junit.lib}">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="plain"/>
+      <batchtest>
+        <fileset dir="${test-classes}">
+          <include name="**/*Test.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <mkdir dir="${reports}/cobertura"/>
+    <cobertura-report destdir="${reports}/cobertura">
+      <fileset dir="${src}">
+        <include name="**/*.java"/>
+      </fileset>
+    </cobertura-report>
+    <delete file="cobertura.ser"/>
+  </target>
+
+  <target name="instrument">
+    <path id="cobertura.classpath">
+      <fileset dir="${cobertura.lib}">
+          <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+
+    <delete file="cobertura.ser"/>
+    <delete dir="${instrumented-classes}"/>
+
+    <cobertura-instrument todir="${instrumented-classes}">
+      <fileset dir="${classes}">
+        <include name="**/*.class"/>
+        <exclude name="**/*Test.class"/>
+      </fileset>
+    </cobertura-instrument>
+  </target>
+
+  <target name="usage_report">
+    <path id="cobertura.classpath">
+      <fileset dir="${cobertura.lib}">
+          <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+    <cobertura-merge>
+      <fileset dir=".">
+        <include name="*.ser" />
+      </fileset>
+    </cobertura-merge>
+
+    <mkdir dir="${reports}/usage"/>
+    <cobertura-report destdir="${reports}/usage">
+      <fileset dir="${src}">
+        <include name="**/*.java"/>
+      </fileset>
+    </cobertura-report>
+  </target>
+
+  <target name="reports" depends="compile,pmd,findbugs,crap4j"/>
+
+  <target name="view">
+    <taskdef name="java2html" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${java2html.lib}/java2html.jar"/>
+    <java2html
+     srcdir="${src}"
+     destdir="${reports}/src"
+     includes="**/*.java"
+     style="eclipse"
+     showLineNumbers="true"
+     showFileName="false"
+     showTableBorder="false"/>
   </target>
 </project>
