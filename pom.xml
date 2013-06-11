@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>zsoltfabok.com</groupId>
+  <artifactId>arithmetic.expression.evaluator</artifactId>
+  <packaging>jar</packaging>
+  <name>arithmetic.expression.evaluator</name>
+  <version>0.1</version>
+  <description>A very simple arithmetic expression evaluator</description>
+  <url>https://github.com/ZsoltFabok/arithmetic.expression.evaluator</url>
+  <licenses>
+    <license>
+      <name>BSD-3-Clause</name>
+      <url>http://opensource.org/licenses/BSD-3-Clause</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git@github.com:ZsoltFabok/arithmetic.expression.evaluator.git</connection>
+    <developerConnection>scm:git:git@github.com:ZsoltFabok/arithmetic.expression.evaluator.git</developerConnection>
+    <url>git@github.com:ZsoltFabok/arithmetic.expression.evaluator.git</url>
+  </scm>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  <developers>
+    <developer>
+      <id>fabokzs</id>
+      <name>Zsolt Fabok</name>
+      <email>me@zsoltfabok.com</email>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
