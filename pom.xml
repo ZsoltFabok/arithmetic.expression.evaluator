@@ -4,7 +4,7 @@
   <artifactId>arithmetic.expression.evaluator</artifactId>
   <packaging>jar</packaging>
   <name>arithmetic.expression.evaluator</name>
-  <version>0.1</version>
+  <version>0.2-SNAPSHOT</version>
   <description>A very simple arithmetic expression evaluator</description>
   <url>https://github.com/ZsoltFabok/arithmetic.expression.evaluator</url>
   <licenses>
